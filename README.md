@@ -15,7 +15,7 @@ It exists for demo purposes and may omit internal assets, history, or tooling fr
 | Model | mAP | Rank-1 | Rank-5 | Rank-10 | Rank-1+RR | Params | Speed |
 |-------|-----|--------|--------|---------|-----------|--------|-------|
 | **Baseline** (CLIP-ReID, 60 ep) | 91.5% | 96.4% | 99.1% | 99.5% | 96.7% | 126.8M | 18.8 ms/img |
-| **Custom** (ViT-CLIP-ReID-SIE-OLP, S1=3ep S2=60ep) | 93.0% | 97.2% | 99.2% | 99.5% | 97.7% | 127.2M | 21.2 ms/img |
+| **Custom** (ViT-CLIP-ReID-SIE-OLP, S1=120ep S2=60ep) | 93.0% | 97.2% | 99.2% | 99.5% | 97.7% | 127.2M | 21.2 ms/img |
 
 > RR = k-reciprocal re-ranking.
 
@@ -116,6 +116,8 @@ All retrieval visualisation classes/queries currently available in the demo set:
 ---
 
 ## Model Architecture
+
+![V-Track architecture](./docs/V-Track%20architecture.png)
 
 Two-stage fine-tuning of CLIP ViT-B/16 with a split image/text training flow:
 
