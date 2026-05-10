@@ -1,0 +1,60 @@
+# Mini pipeline config — 1000 images from Market-1501 (~100 identities)
+# Purpose: smoke-test the full two-stage training pipeline quickly
+#
+# Usage:
+#   python src/train/train_stage1.py --mini
+#   python src/train/train_stage2.py --mini --stage1-checkpoint output/stage1_epoch003.pth
+
+pipeline:
+  name: "vit-clipreid-mini"
+  description: "Mini smoke-test: ~100 IDs × ~10 imgs from Market-1501 train set"
+
+data:
+  market1501_root: "/Users/dangnguyen/Downloads/pedestrian/Market-1501-v15.09.15"
+  mini: true
+  mini_num_ids: 100          # 100 unique identities → ~1000 images total
+  num_workers: 2             # Windows-safe; keep ≤2
+
+model:
+  clip_model_name: "openai/clip-vit-base-patch16"
+  n_ctx: 4                   # number of learnable context tokens
+  prompt_template: "a photo of a X X X X person"
+  num_views: 1               # Market-1501 has no view annotations
+  olp_k: 4                   # top-k patches for OLP (reduced for mini speed)
+
+training:
+  batch_size: 32             # small batch for mini
+  num_instances: 4           # P=8 IDs × K=4 imgs per batch
+
+  stage1:
+    epochs: 3
+    lr: 3.5e-4
+    warmup_epochs: 1
+    weight_decay: 1.0e-4
+
+  stage2:
+    epochs: 2
+    lr: 3.5e-5
+    lr_decay_steps: [30, 50]
+    lr_decay_gamma: 0.1
+    early_stop_patience: 999  # no early stopping in mini mode
+
+  fp16: true                 # FP16 on CUDA (V100); disabled automatically on CPU
+
+losses:
+  id_loss_weight: 0.25
+  triplet_loss_weight: 1.0
+  i2t_loss_weight: 1.0
+  triplet_margin: 0.3
+  label_smoothing: 0.1
+
+evaluation:
+  eval_freq: 1               # evaluate every epoch in mini mode
+  use_rerank: false          # skip re-ranking during training (speed)
+  rerank_k1: 20
+  rerank_k2: 6
+  rerank_lambda: 0.3
+
+output:
+  output_dir: "output/mini"
+  checkpoint_period: 1       # save every epoch in mini mode

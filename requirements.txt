@@ -1,0 +1,22 @@
+# ── PyTorch: install SEPARATELY with the command below ────────────────────────
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# (do NOT install torch from this file — the CUDA wheels are not on PyPI)
+
+# ── HuggingFace ────────────────────────────────────────────────────────────────
+transformers>=4.40.0
+accelerate>=0.27.0
+peft>=0.10.0
+
+# ── Vision / ML ────────────────────────────────────────────────────────────────
+timm>=0.9.0
+Pillow>=10.0.0
+scikit-image>=0.21.0
+numpy>=1.26.0
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+tqdm>=4.66.0
+yacs>=0.1.8
+gdown>=5.1.0
+
+# ── Testing ────────────────────────────────────────────────────────────────────
+pytest>=8.0.0

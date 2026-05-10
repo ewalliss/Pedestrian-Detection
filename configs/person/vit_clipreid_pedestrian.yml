@@ -1,0 +1,59 @@
+# Full training config — all pedestrian datasets
+# Market-1501 + (optionally) MOT17 crops
+#
+# Usage:
+#   python src/train/train_stage1.py --market1501-root /Users/dangnguyen/Downloads/pedestrian/Market-1501-v15.09.15
+#   python src/train/train_stage2.py --stage1-checkpoint output/stage1_epoch060.pth
+
+pipeline:
+  name: "vit-clipreid-pedestrian"
+  description: "Full training: all pedestrian ReID data (Market-1501 + MOT crops)"
+
+data:
+  market1501_root: "/Users/dangnguyen/Downloads/pedestrian/Market-1501-v15.09.15"
+  mini: false
+  num_workers: 2             # Windows-safe; keep ≤2
+
+model:
+  clip_model_name: "openai/clip-vit-base-patch16"
+  n_ctx: 4
+  prompt_template: "a photo of a X X X X person"
+  num_views: 1               # Market-1501 has no view annotations
+  olp_k: 8                   # top-8 patches for OLP
+
+training:
+  batch_size: 64             # 16 IDs × 4 imgs per ID
+  num_instances: 4
+
+  stage1:
+    epochs: 60
+    lr: 3.5e-4
+    warmup_epochs: 5
+    weight_decay: 1.0e-4
+
+  stage2:
+    epochs: 120
+    lr: 3.5e-5
+    lr_decay_steps: [40, 70]
+    lr_decay_gamma: 0.1
+    early_stop_patience: 10  # stop if no mAP improvement for 10 evals
+
+  fp16: true                 # FP16 on CUDA (V100); disabled automatically on CPU
+
+losses:
+  id_loss_weight: 0.25
+  triplet_loss_weight: 1.0
+  i2t_loss_weight: 1.0
+  triplet_margin: 0.3
+  label_smoothing: 0.1
+
+evaluation:
+  eval_freq: 5               # evaluate every 5 epochs
+  use_rerank: true
+  rerank_k1: 20
+  rerank_k2: 6
+  rerank_lambda: 0.3
+
+output:
+  output_dir: "output/full"
+  checkpoint_period: 10      # save checkpoint every 10 epochs
